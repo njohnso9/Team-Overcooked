@@ -1,0 +1,210 @@
+#include <Wire.h>
+#include <Adafruit_MAX31855.h>
+#include <LiquidCrystal_I2C.h>
+
+#define MAX_THERMOCOUPLES 8
+
+// Define pin assignments for shared T0, T1, T2, SO, CS, SCK pins
+const int T0_PIN = 33;
+const int T1_PIN = 31; 
+const int T2_PIN = 29; 
+const int SO_PIN = 27;
+const int CS_PIN = 25; 
+const int SCK_PIN = 23; 
+const int SCK_PIN2 = 22; 
+const int SO_PIN2 = 26;
+const int CS_PIN2 = 24; 
+
+// I2C LCD setup
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // Adjust the I2C address if needed
+
+// Adafruit_MAX31855 instance for the shared chip
+Adafruit_MAX31855 thermocouple(SCK_PIN, CS_PIN, SO_PIN);
+Adafruit_MAX31855 thermocouple2(SCK_PIN2, CS_PIN2, SO_PIN2);
+
+void setup() {
+  Serial.begin(9600);
+  // Initialize shared T0, T1, T2, CS, SCK pins
+  pinMode(T0_PIN, OUTPUT);
+  pinMode(T1_PIN, OUTPUT);
+  pinMode(T2_PIN, OUTPUT);
+  pinMode(CS_PIN, OUTPUT);
+  pinMode(SCK_PIN, OUTPUT);
+}
+
+void loop() {
+Serial.print("TEST TEST TEST TEST TEST TEST TEST TEST \n");
+    digitalWrite(T0_PIN, LOW);
+    digitalWrite(T1_PIN, LOW);
+    digitalWrite(T2_PIN, LOW);
+    Serial.print("Sensor1 ");
+ double a = thermocouple.readFahrenheit();
+    if (isnan(a)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(a);
+    }
+
+    delay(400);  // Add a delay between readings of each sensor
+
+    digitalWrite(T0_PIN, HIGH);
+    digitalWrite(T1_PIN, LOW);
+    digitalWrite(T2_PIN, LOW);
+    Serial.print("Sensor2 ");
+ double b = thermocouple.readFahrenheit();
+    if (isnan(b)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(b);
+    }
+
+    delay(400);  // Add a delay between readings of each sensor
+
+    digitalWrite(T0_PIN, LOW);
+    digitalWrite(T1_PIN, HIGH);
+    digitalWrite(T2_PIN, LOW);
+    Serial.print("Sensor3 ");
+ double c = thermocouple.readFahrenheit();
+    if (isnan(c)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(c);
+    }
+
+    delay(400);  // Add a delay between readings of each sensor
+
+    digitalWrite(T0_PIN, HIGH);
+    digitalWrite(T1_PIN, HIGH);
+    digitalWrite(T2_PIN, LOW);
+    Serial.print("Sensor4 ");
+ double d = thermocouple.readFahrenheit();
+    if (isnan(d)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(d);
+    }
+
+    delay(400);  // Add a delay between readings of each sensor
+
+    digitalWrite(T0_PIN, LOW);
+    digitalWrite(T1_PIN, LOW);
+    digitalWrite(T2_PIN, HIGH);
+    Serial.print("Sensor5 ");
+ double e = thermocouple.readFahrenheit();
+    if (isnan(e)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(e);
+    }
+
+    delay(400);  // Add a delay between readings of each sensor
+
+    digitalWrite(T0_PIN, HIGH);
+    digitalWrite(T1_PIN, LOW);
+    digitalWrite(T2_PIN, HIGH);
+    Serial.print("Sensor6 ");
+ double f = thermocouple.readFahrenheit();
+    if (isnan(f)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(f);
+    }
+
+    delay(400);  // Add a delay between readings of each sensor
+
+    digitalWrite(T0_PIN, LOW);
+    digitalWrite(T1_PIN, HIGH);
+    digitalWrite(T2_PIN, HIGH);
+    Serial.print("Sensor7 ");
+ double g = thermocouple.readFahrenheit();
+    if (isnan(g)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(g);
+    }
+
+    delay(400);  // Add a delay between readings of each sensor
+
+    digitalWrite(T0_PIN, HIGH);
+    digitalWrite(T1_PIN, HIGH);
+    digitalWrite(T2_PIN, HIGH);
+    Serial.print("Sensor8 ");
+ double h = thermocouple.readFahrenheit();
+    if (isnan(h)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(h);
+    }
+
+    delay(400);  // Add a delay between readings of each sensor
+
+    Serial.print("Sensor9 ");
+ double i = thermocouple2.readFahrenheit();
+    if (isnan(i)) {
+      Serial.println("Thermocouple fault(s) detected!");
+      uint8_t e = thermocouple.readError();
+      if (e & MAX31855_FAULT_OPEN) Serial.println("FAULT: Thermocouple is open - no connections.");
+      if (e & MAX31855_FAULT_SHORT_GND) Serial.println("FAULT: Thermocouple is short-circuited to GND.");
+      if (e & MAX31855_FAULT_SHORT_VCC) Serial.println("FAULT: Thermocouple is short-circuited to VCC.");
+    } else {
+      // Print temperature on both Serial and LCD
+      Serial.print("F = ");
+      Serial.println(i);
+    }
+
+    delay(400);
+
+      double avg = (a+b+c+d+e+f+g+h+i)/9;
+      Serial.print("Average Temperature = ");
+      Serial.println(avg);
+  
+  delay(1000);
+}
