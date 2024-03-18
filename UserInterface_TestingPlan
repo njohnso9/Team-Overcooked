@@ -1,0 +1,201 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <Keypad.h>
+
+// number of rows and columns for the keypad
+const byte ROWS = 4;
+const byte COLS = 4;
+
+// keypad layout
+char hexaKeys[ROWS][COLS] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+
+// ow and column pins for the keypad
+byte rowPins[ROWS] = {6, 7, 8, 9};
+byte colPins[COLS] = {2, 3, 4, 5};
+
+// pins for each individual LED
+const int Pin1 = 52;
+const int Pin2 = 50;
+const int Pin3 = 48;
+
+const int Pin4 = 46;
+const int Pin5 = 44;
+const int Pin6 = 42;
+
+const int Pin7 = 53;
+const int Pin8 = 51;
+const int Pin9 = 49;
+
+//temperature values for each LED this is just for testing plan
+const int temperatureValuePin1 = 81;
+const int temperatureValuePin2 = 80;
+const int temperatureValuePin3 = 85;
+const int temperatureValuePin4 = 90;
+const int temperatureValuePin5 = 82;
+const int temperatureValuePin6 = 88;
+const int temperatureValuePin7 = 83;
+const int temperatureValuePin8 = 87;
+const int temperatureValuePin9 = 90;
+
+// Initialize keypad and LCD
+Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+
+// Initialize variable to store the input temp
+String inputTemperatureStr = "";
+
+// Initialize variable to store current temperature
+int currentTemperature = 0;
+
+// Initialize variable to store the last time 'D' key was pressed
+unsigned long lastDKeyPressTime = 0;
+
+// Set the delay before allowing another 'D' to be press
+const unsigned long DKeyDelay = 100;
+
+//backspace functionality
+void handleBackspace() {
+  if (inputTemperatureStr.length() > 0) {
+    inputTemperatureStr.remove(inputTemperatureStr.length() - 1);
+  }
+}
+
+void setup() {
+  // Set mode of LED pin as OUTPUT
+  pinMode(Pin1, OUTPUT);
+  pinMode(Pin2, OUTPUT);
+  pinMode(Pin3, OUTPUT);
+  pinMode(Pin4, OUTPUT);
+  pinMode(Pin5, OUTPUT);
+  pinMode(Pin6, OUTPUT);
+  pinMode(Pin7, OUTPUT);
+  pinMode(Pin8, OUTPUT);
+  pinMode(Pin9, OUTPUT);
+
+  lcd.begin(20, 4);
+
+  //random number generator
+  randomSeed(analogRead(0));
+
+  // Initialize the LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+  lcd.setCursor(0, 1);
+  lcd.print("Input Temp:   ");
+}
+
+// Loop function
+void loop() {
+  // Read a key from the keypad
+  char key = keypad.getKey();
+
+  // Process key if pressed
+  if (key != NO_KEY) {
+    // Check if the key is 'A'
+    if (key == 'A') {
+      currentTemperature = generateRandomTemperature();
+      displayTemperature("Current Temp:", currentTemperature);
+      lcd.setCursor(0, 1);
+      lcd.print("Input Temp:   "); // Clear the previous input temperature
+      lcd.print(inputTemperatureStr);
+    }
+    // Check if the key is 'D'
+    else if (key == 'D') {
+      // Check the time difference since the last 'D' key press
+      unsigned long currentTime = millis();
+      if (currentTime - lastDKeyPressTime >= DKeyDelay) {
+        // Handle backspace functionality
+        handleBackspace();
+        displayTemperature("Current Temp:", currentTemperature);
+        lcd.setCursor(0, 1);
+        lcd.print("Input Temp:   ");
+        lcd.print(inputTemperatureStr);
+        // Update the last 'D' key press time
+        lastDKeyPressTime = currentTime;
+      } else {
+        // If pressed quickly, remove all digits
+        inputTemperatureStr = "";
+        displayTemperature("Current Temp:", currentTemperature);
+        lcd.setCursor(0, 1);
+        lcd.print("Input Temp:   ");
+        lcd.print(inputTemperatureStr);
+      }
+    }
+    // Check if the key is 'C'
+    else if (key == 'C') {
+      int inputTemperature = inputTemperatureStr.toInt();
+      if (inputTemperature >= temperatureValuePin1 && inputTemperature <= temperatureValuePin9) {
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Input Accepted");
+        delay(1000);
+        lcd.clear();
+        lcd.setCursor(0, 1);
+        displayTemperature("Current Temp:", currentTemperature);
+        lcd.setCursor(0, 1);
+        lcd.print("Input Temp:   ");
+        lcd.print(inputTemperatureStr);
+        checkAndDisplayLED(inputTemperature);
+        inputTemperatureStr = "";
+      } else {
+        inputTemperatureStr = "";
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("ERROR");
+        delay(1000);
+        lcd.clear();
+        lcd.setCursor(0, 1);
+        displayTemperature("Current Temp:", currentTemperature);
+        lcd.setCursor(0, 1);
+        lcd.print("Input Temp:   ");
+        lcd.print(inputTemperatureStr);
+      }
+    }
+    // Check if the key is a num
+    else if (key >= '0' && key <= '9') {
+      if (inputTemperatureStr.length() == 0) {
+        displayTemperature("Current Temp:", currentTemperature);
+        lcd.setCursor(0, 1);
+        lcd.print("Input Temp:   ");
+        lcd.print(inputTemperatureStr);
+      }
+      inputTemperatureStr += key;
+      displayTemperature("Current Temp:", currentTemperature);
+      lcd.setCursor(0, 1);
+      lcd.print("Input Temp:   ");
+      lcd.print(inputTemperatureStr);
+    }
+  }
+}
+
+void checkAndDisplayLED(int inputTemperature) {
+  digitalWrite(Pin1, abs(inputTemperature - temperatureValuePin1) <= 3);
+  digitalWrite(Pin2, abs(inputTemperature - temperatureValuePin2) <= 3);
+  digitalWrite(Pin3, abs(inputTemperature - temperatureValuePin3) <= 3);
+  digitalWrite(Pin4, abs(inputTemperature - temperatureValuePin4) <= 3);
+  digitalWrite(Pin5, abs(inputTemperature - temperatureValuePin5) <= 3);
+  digitalWrite(Pin6, abs(inputTemperature - temperatureValuePin6) <= 3);
+  digitalWrite(Pin7, abs(inputTemperature - temperatureValuePin7) <= 3);
+  digitalWrite(Pin8, abs(inputTemperature - temperatureValuePin8) <= 3);
+  digitalWrite(Pin9, abs(inputTemperature - temperatureValuePin9) <= 3);
+}
+
+void displayTemperature(String label, int temperature) {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(label);
+  lcd.print(" ");
+  lcd.print(temperature);
+}
+
+int generateRandomTemperature() {
+  int inputTemperature = inputTemperatureStr.toInt();
+  int lowerLimit = max(temperatureValuePin1, inputTemperature - 2);
+  int upperLimit = min(temperatureValuePin9, inputTemperature + 2);
+  return random(lowerLimit, upperLimit + 1);
